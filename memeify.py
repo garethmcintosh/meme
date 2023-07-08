@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 # Function to calculate the text size
 def scale_font(draw, caption, box_width, max_font_size=None):
@@ -24,8 +24,8 @@ caption = input("Enter the caption for the image: ")
 # Prompt user for a watermark
 watermark = input("Enter a watermark for the image: ")
 
-# Calculate the size of the caption box (just the width of the image and 10% of its height)
-caption_height = int(img.height * 0.1)
+# Calculate the size of the caption box (just the width of the image and 15% of its height)
+caption_height = int(img.height * 0.15)
 caption_box = (img.width, caption_height)
 
 # Create a new image for the caption
@@ -52,16 +52,18 @@ draw.text(text_position, watermark, fill=white, font=font)
 
 # Get original file name and extension
 file_name, file_ext = image_file.rsplit('.', 1)
+file_ext = file_ext.upper()
 
 # Check if final image name already exists
 try:
     with open(f"output/{file_name}_meme.{file_ext}"):
         print("File already exists!")
-        input = input("Do you want to overwrite it? (y/n): ")
-        if input.lower() == "y":
-            final_img.save(f"output/{file_name}_meme.{file_ext}")
+        input_val = input("Do you want to overwrite it? (y/n): ")
+        if input_val.lower() == "y":
+            final_img.save(f"output/{file_name}_meme.{file_ext}", quality=15)
+            print("File saved!")
         else:
             print("File not saved!")
 except IOError:
     print("File does not exist. Saving...")
-    final_img.save(f"output/{file_name}_meme.{file_ext}")
+    final_img.save(f"output/{file_name}_meme.{file_ext}", quality=15)
