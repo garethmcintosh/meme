@@ -1,4 +1,4 @@
-# memeify
+# meme
 make memes through cli
 
 usage :
