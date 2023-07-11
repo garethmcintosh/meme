@@ -23,7 +23,7 @@ Parameters:
 
 Example usage:
 
-```python memeify.py test.jpg "This is a caption" "watermark" --meme_type overlay --text_position bottom```
+```python memeify.py input\test.jpg "This is a caption" "watermark" --meme_type overlay --text_position bottom```
 
 
 ## Output
