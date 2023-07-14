@@ -1,6 +1,6 @@
 # Meme
 
-Meme is a Python script that allows you to create two types of memes through cli: Caption and Overlay. The Caption meme type adds a caption above or below the image. The Overlay meme type overlays the caption on top or bottom of the image. Both types allow you to add a watermark as well.
+Meme is a Python script that allows you to create two types of memes through CLI: Caption and Overlay. The Caption meme type adds a caption above or below the image. The Overlay meme type overlays the caption on top or bottom of the image. Both types allow you to add a watermark, positioned randomly within a box in the center of the image.
 
 ## Requirements
 - Python
@@ -10,21 +10,23 @@ Meme is a Python script that allows you to create two types of memes through cli
 
 Here's how to use the script:
 
-```python memeify.py <image_file> <caption> <watermark> --meme_type <meme_type> --text_position <text_position>```
-
+```python
+memeify.py <image_file> <caption> <watermark> --type <meme_type> --position <text_position>
+```
 
 Parameters:
 
 - `image_file`: This is the path to the image file you want to memeify. The image should be placed in the `input/` directory.
 - `caption`: The caption text you want to add to the image.
 - `watermark`: The watermark text you want to add to the image.
-- `meme_type`: This is an optional argument. The type of meme you want to generate. It can be either `caption` or `overlay`. If not provided, the script will generate a `caption` type meme.
-- `text_position`: This is an optional argument. The position of the text. It can be either `top` or `bottom`. If not provided, the script will put the text at the `top`.
+- `type`: This is an optional argument. The type of meme you want to generate. It can be either `caption` or `overlay`. If not provided, the script will generate a `caption` type meme.
+- `position`: This is an optional argument. The position of the text. It can be either `top` or `bottom`. If not provided, the script will put the text at the `top`.
 
 Example usage:
 
-```python memeify.py input\test.jpg "This is a caption" "watermark" --meme_type overlay --text_position bottom```
-
+```python
+memeify.py input/test.jpg "This is a caption" "watermark" --type overlay --position bottom
+```
 
 ## Output
 
