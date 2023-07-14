@@ -83,7 +83,7 @@ def process_frame(img, args):
     random_x = random.randint(min_x, min_x + box_width - text_width)
     random_y = random.randint(min_y, min_y + box_height - text_height)
     watermark_position = (random_x, random_y)
-
+    white = (255, 255, 255)
     draw.text(watermark_position, args.mark, fill=white, font=font)
 
     return final_img
