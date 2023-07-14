@@ -1,5 +1,6 @@
 import argparse
 import os
+import random
 from PIL import Image, ImageDraw, ImageFont
 import cv2
 import numpy as np
@@ -10,7 +11,6 @@ import imageio
 def scale_font(draw, text, box_width, box_height, max_font_size=None):
     font_size = 1
     font = ImageFont.truetype("arial.ttf", font_size)
-    # Increase font size until text width is smaller than box width
     while True:
         w, h = draw.textsize(text, font=font)
         if (w < box_width and h < box_height) and (
@@ -43,17 +43,6 @@ def process_frame(img, args):
         elif args.position == "bottom":
             final_img.paste(img, (0, 0))
             final_img.paste(caption_img, (0, img.height))
-        draw = ImageDraw.Draw(final_img)
-        font = scale_font(
-            draw, args.mark, img.width - 20, img.height // 8, max_font_size=10
-        )
-        text_width, text_height = font.getsize(args.mark)
-        white = (255, 255, 255)
-        if args.position == "top":
-            watermark_position = (10, final_img.height - text_height - 10)
-        elif args.position == "bottom":
-            watermark_position = (10, 10)
-        draw.text(watermark_position, args.mark, fill=white, font=font)
     elif args.type == "overlay":
         final_img = img.copy()
         draw = ImageDraw.Draw(final_img)
@@ -77,22 +66,26 @@ def process_frame(img, args):
             stroke_width=stroke_width,
             stroke_fill=black,
         )
-        font = scale_font(
-            draw, args.mark, img.width - 20, img.height // 8, max_font_size=10
-        )
-        text_width, text_height = font.getsize(args.mark)
-        text_position = (10, img.height - text_height - 10)
-        draw.text(
-            text_position,
-            args.mark,
-            fill=white,
-            font=font,
-            stroke_width=stroke_width,
-            stroke_fill=black,
-        )
     else:
         print(f"Invalid meme type: {args.type}")
         exit(1)
+
+    draw = ImageDraw.Draw(final_img)
+    font = scale_font(draw, args.mark, img.width // 4, img.height // 4, max_font_size=15)
+    text_width, text_height = font.getsize(args.mark)
+
+    # Create a centered box and then calculate a random position for watermark inside it
+    center_x, center_y = final_img.width // 2, final_img.height // 2
+    box_width, box_height = img.width // 4, img.height // 4
+    min_x = center_x - box_width // 2
+    min_y = center_y - box_height // 2
+
+    random_x = random.randint(min_x, min_x + box_width - text_width)
+    random_y = random.randint(min_y, min_y + box_height - text_height)
+    watermark_position = (random_x, random_y)
+
+    draw.text(watermark_position, args.mark, fill=white, font=font)
+
     return final_img
 
 
