@@ -15,7 +15,7 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
     font_size = max_font_size or 100  # Start with a larger font size
     min_font_size = 10  # Don't go below this font size
     step_size = 10  # Adjust font size by this step size
-    font = ImageFont.truetype("arial.ttf", font_size)
+    font = ImageFont.truetype("impact.ttf", font_size)
 
     while font_size >= min_font_size:
         text_lines = textwrap.wrap(text, width=int(box_width / (font_size * 0.35)))  # Adjusted divisor for wider lines
@@ -30,7 +30,7 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
 
         # If the text doesn't fit, decrease the font size
         font_size -= step_size
-        font = ImageFont.truetype("arial.ttf", font_size)
+        font = ImageFont.truetype("impact.ttf", font_size)
 
     print("Text can't fit into the box, even at the smallest font size.")
     return font, text_lines
@@ -39,14 +39,14 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
 # Function to calculate the text size for caption
 def scale_font(draw, text, box_width, box_height, max_font_size=None):
     font_size = 1
-    font = ImageFont.truetype("arial.ttf", font_size)
+    font = ImageFont.truetype("impact.ttf", font_size)
     while True:
         w, h = draw.textsize(text, font=font)
         if (w < box_width and h < box_height) and (
             not max_font_size or font_size < max_font_size
         ):
             font_size += 1
-            font = ImageFont.truetype("arial.ttf", font_size)
+            font = ImageFont.truetype("impact.ttf", font_size)
         else:
             return font
 
