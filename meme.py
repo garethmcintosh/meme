@@ -18,7 +18,7 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
     font = ImageFont.truetype("arial.ttf", font_size)
 
     while font_size >= min_font_size:
-        text_lines = textwrap.wrap(text, width=int(box_width / (font_size * 0.45)))  # Reduced divisor for wider lines
+        text_lines = textwrap.wrap(text, width=int(box_width / (font_size * 0.35)))  # Adjusted divisor for wider lines
         line_heights = [draw.textsize(line, font=font)[1] for line in text_lines]
         line_widths = [draw.textsize(line, font=font)[0] for line in text_lines]
         max_line_width = max(line_widths)
@@ -34,6 +34,7 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
 
     print("Text can't fit into the box, even at the smallest font size.")
     return font, text_lines
+
 
 # Function to calculate the text size for caption
 def scale_font(draw, text, box_width, box_height, max_font_size=None):
@@ -77,10 +78,10 @@ def process_frame(img, args):
     elif args.type == "overlay":
         final_img = img.copy()
         draw = ImageDraw.Draw(final_img)
-        font, text_lines = fit_text_to_box(draw, args.text, img.width // 1.25, img.height // 2)
+        font, text_lines = fit_text_to_box(draw, args.text, img.width, img.height // 2, max_font_size=150)
         white = (255, 255, 255)
         black = (0, 0, 0)
-        stroke_width = 2
+        stroke_width = 8
 
         for i, line in enumerate(text_lines):
             text_width, text_height = draw.textsize(line, font=font)
