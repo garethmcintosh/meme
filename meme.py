@@ -35,6 +35,20 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
     print("Text can't fit into the box, even at the smallest font size.")
     return font, text_lines
 
+# Function to calculate the text size for caption
+def scale_font(draw, text, box_width, box_height, max_font_size=None):
+    font_size = 1
+    font = ImageFont.truetype("arial.ttf", font_size)
+    while True:
+        w, h = draw.textsize(text, font=font)
+        if (w < box_width and h < box_height) and (
+            not max_font_size or font_size < max_font_size
+        ):
+            font_size += 1
+            font = ImageFont.truetype("arial.ttf", font_size)
+        else:
+            return font
+
 
 
 
@@ -44,18 +58,14 @@ def process_frame(img, args):
         caption_box = (img.width, caption_height)
         caption_img = Image.new("RGB", caption_box, color=(255, 255, 255))
         draw = ImageDraw.Draw(caption_img)
-        font, text_lines = fit_text_to_box(draw, args.text, img.width / 1.25, img.height // 2)
+        font = scale_font(draw, args.text, img.width - 20, caption_height)
+        text_height = font.getsize(args.text)[1]
+        if args.position == "top":
+            text_position = (10, (caption_height - text_height) // 2)
+        elif args.position == "bottom":
+            text_position = (10, caption_height - text_height - 25)
         black = (0, 0, 0)
-
-        for i, line in enumerate(text_lines):
-            text_width, text_height = draw.textsize(line, font=font)
-            if args.position == "top":
-                text_position = (10, i * text_height)
-            elif args.position == "bottom":
-                text_position = (10, caption_height - text_height * (len(text_lines) - i))
-
-            draw.text(text_position, line, fill=black, font=font)
-
+        draw.text(text_position, args.text, fill=black, font=font)
         final_img = Image.new("RGB", (img.width, img.height + caption_height))
         if args.position == "top":
             final_img.paste(caption_img, (0, 0))
