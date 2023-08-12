@@ -15,6 +15,8 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
     font_size = max_font_size or 100  # Start with a larger font size
     min_font_size = 10  # Don't go below this font size
     step_size = 10  # Adjust font size by this step size
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    font = ImageFont.truetype(font_path, font_size)
     font = ImageFont.truetype("impact.ttf", font_size)
 
     while font_size >= min_font_size:
@@ -50,7 +52,37 @@ def scale_font(draw, text, box_width, box_height, max_font_size=None):
         else:
             return font
 
+# Function to get custom position on image for test through ascii-graphical preview with instant input feedback
+def get_custom_position(img_width, caption_height):
+    position = {'x': 10, 'y': caption_height}
+    position_confirmed = False
+    step = 10
 
+    while not position_confirmed:
+        # Draw the ASCII art box
+        print("+", "-" * (img_width // step), "+")
+        for _ in range(caption_height // step):
+            print("|", " " * (img_width // step), "|")
+        print("|", " " * (position['x'] // step) + "TEXT" + " " * ((img_width - position['x'] - len("TEXT")) // step), "|")
+        print("|", " " * (img_width // step), "|")
+        for _ in range((img_width - caption_height) // step):
+            print("|", " " * (img_width // step), "|")
+        print("+", "-" * (img_width // step), "+")
+
+        user_input = input("Move text with 'w', 'a' 's', 'd', or confirm position with 'x': ")
+
+        if user_input == "w":
+            position['y'] = max(0, position['y'] - step)
+        elif user_input == "a":
+            position['x'] = max(0, position['x'] - step)
+        elif user_input == "s":
+            position['y'] = min(img_width - caption_height, position['y'] + step)
+        elif user_input == "d":
+            position['x'] = min(img_width - len("TEXT"), position['x'] + step)
+        elif user_input == "x":
+            position_confirmed = True
+
+    return position
 
 
 def process_frame(img, args):
@@ -65,6 +97,8 @@ def process_frame(img, args):
             text_position = (10, (caption_height - text_height) // 2)
         elif args.position == "bottom":
             text_position = (10, caption_height - text_height - 25)
+        elif args.position == "custom":
+            text_position = get_custom_position(img.width, caption_height)
         black = (0, 0, 0)
         draw.text(text_position, args.text, fill=black, font=font)
         final_img = Image.new("RGB", (img.width, img.height + caption_height))
@@ -135,7 +169,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--position",
-    choices=["top", "bottom"],
+    choices=["top", "bottom", "custom"],
     default="top",
     help="Position of the caption text",
 )
