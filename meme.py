@@ -8,19 +8,20 @@ import imageio
 import textwrap
 import warnings
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
+
 
 # Function to calculate the text size and wrap it
 def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
     font_size = max_font_size or 100  # Start with a larger font size
     min_font_size = 10  # Don't go below this font size
     step_size = 10  # Adjust font size by this step size
-    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-    font = ImageFont.truetype(font_path, font_size)
     font = ImageFont.truetype("impact.ttf", font_size)
 
     while font_size >= min_font_size:
-        text_lines = textwrap.wrap(text, width=int(box_width / (font_size * 0.35)))  # Adjusted divisor for wider lines
+        text_lines = textwrap.wrap(
+            text, width=int(box_width / (font_size * 0.35))
+        )  # Adjusted divisor for wider lines
         line_heights = [draw.textsize(line, font=font)[1] for line in text_lines]
         line_widths = [draw.textsize(line, font=font)[0] for line in text_lines]
         max_line_width = max(line_widths)
@@ -52,33 +53,42 @@ def scale_font(draw, text, box_width, box_height, max_font_size=None):
         else:
             return font
 
+
 # Function to get custom position on image for test through ascii-graphical preview with instant input feedback
-def get_custom_position(img_width, caption_height):
-    position = {'x': 10, 'y': caption_height}
+def get_custom_position(img_width, text_height):
+    position = {"x": 10, "y": text_height}
     position_confirmed = False
     step = 10
 
-    while not position_confirmed:
+    while position_confirmed is False:
         # Draw the ASCII art box
         print("+", "-" * (img_width // step), "+")
-        for _ in range(caption_height // step):
+        for _ in range(text_height // step):
             print("|", " " * (img_width // step), "|")
-        print("|", " " * (position['x'] // step) + "TEXT" + " " * ((img_width - position['x'] - len("TEXT")) // step), "|")
+        print(
+            "|",
+            " " * (position["x"] // step)
+            + "TEXT"
+            + " " * ((img_width - position["x"] - len("TEXT")) // step),
+            "|",
+        )
         print("|", " " * (img_width // step), "|")
-        for _ in range((img_width - caption_height) // step):
+        for _ in range((img_width - text_height) // step):
             print("|", " " * (img_width // step), "|")
         print("+", "-" * (img_width // step), "+")
 
-        user_input = input("Move text with 'w', 'a' 's', 'd', or confirm position with 'x': ")
+        user_input = input(
+            "Move text with 'w', 'a' 's', 'd', or confirm position with 'x': "
+        )
 
         if user_input == "w":
-            position['y'] = max(0, position['y'] - step)
+            position["y"] = max(0, position["y"] - step)
         elif user_input == "a":
-            position['x'] = max(0, position['x'] - step)
+            position["x"] = max(0, position["x"] - step)
         elif user_input == "s":
-            position['y'] = min(img_width - caption_height, position['y'] + step)
+            position["y"] = min(img_width - text_height, position["y"] + step)
         elif user_input == "d":
-            position['x'] = min(img_width - len("TEXT"), position['x'] + step)
+            position["x"] = min(img_width - len("TEXT"), position["x"] + step)
         elif user_input == "x":
             position_confirmed = True
 
@@ -97,8 +107,6 @@ def process_frame(img, args):
             text_position = (10, (caption_height - text_height) // 2)
         elif args.position == "bottom":
             text_position = (10, caption_height - text_height - 25)
-        elif args.position == "custom":
-            text_position = get_custom_position(img.width, caption_height)
         black = (0, 0, 0)
         draw.text(text_position, args.text, fill=black, font=font)
         final_img = Image.new("RGB", (img.width, img.height + caption_height))
@@ -112,7 +120,9 @@ def process_frame(img, args):
     elif args.type == "overlay":
         final_img = img.copy()
         draw = ImageDraw.Draw(final_img)
-        font, text_lines = fit_text_to_box(draw, args.text, img.width, img.height // 2, max_font_size=150)
+        font, text_lines = fit_text_to_box(
+            draw, args.text, img.width, img.height // 2, max_font_size=150
+        )
         white = (255, 255, 255)
         black = (0, 0, 0)
         stroke_width = 8
@@ -120,12 +130,18 @@ def process_frame(img, args):
         for i, line in enumerate(text_lines):
             text_width, text_height = draw.textsize(line, font=font)
             if args.position == "top":
-                text_position = ((img.width - text_width) // 2, img.height // 15 + i * text_height)
+                text_position = (
+                    (img.width - text_width) // 2,
+                    img.height // 15 + i * text_height,
+                )
             elif args.position == "bottom":
                 text_position = (
                     (img.width - text_width) // 2,
                     img.height - text_height * (len(text_lines) - i) - img.height // 8,
                 )
+            elif args.position == "custom":
+                position_dict = get_custom_position(img.width, text_height)
+                text_position = (position_dict["x"], position_dict["y"])
             draw.text(
                 text_position,
                 line,
@@ -133,14 +149,16 @@ def process_frame(img, args):
                 font=font,
                 stroke_width=stroke_width,
                 stroke_fill=black,
-        )
+            )
 
     else:
         print(f"Invalid meme type: {args.type}")
         exit(1)
 
     draw = ImageDraw.Draw(final_img)
-    font, watermark_lines = fit_text_to_box(draw, args.mark, img.width // 2, img.height // 2, max_font_size=25)
+    font, watermark_lines = fit_text_to_box(
+        draw, args.mark, img.width // 2, img.height // 2, max_font_size=25
+    )
 
     # Create a centered box and then calculate a random position for watermark inside it
     center_x, center_y = final_img.width // 2, final_img.height // 2
@@ -152,7 +170,10 @@ def process_frame(img, args):
         text_width, text_height = font.getsize(line)
         random_x = random.randint(min_x, min_x + box_width - text_width)
         random_y = random.randint(min_y, min_y + box_height - text_height)
-        watermark_position = (random_x, random_y + i * text_height)  # Adjust y position based on line number
+        watermark_position = (
+            random_x,
+            random_y + i * text_height,
+        )  # Adjust y position based on line number
         white = (255, 255, 255)
         draw.text(watermark_position, line, fill=white, font=font)
 
