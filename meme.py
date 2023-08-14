@@ -91,18 +91,20 @@ def get_custom_position(img_width, text_height):
             "Move text with 'w', 'a' 's', 'd', or confirm position with 'x': "
         )
 
-        if user_input == "w":
-            position["y"] = max(0, position["y"] - step)
-        elif user_input == "a":
-            position["x"] = max(0, position["x"] - step)
-        elif user_input == "s":
-            position["y"] = min(
-                text_height - step, position["y"] + step
-            )  # Change to text_height
-        elif user_input == "d":
-            position["x"] = min(img_width - len("TEXT") * step, position["x"] + step)
-        elif user_input == "x":
-            position_confirmed = True
+        for move in user_input:
+            if move == "w":
+                position["y"] = max(0, position["y"] - step)
+            elif move == "a":
+                position["x"] = max(0, position["x"] - step)
+            elif move == "s":
+                position["y"] = min(text_height - step, position["y"] + step)
+            elif move == "d":
+                position["x"] = min(
+                    img_width - len("TEXT") * step, position["x"] + step
+                )
+            elif move == "x":
+                position_confirmed = True
+                break
 
     return position
 
