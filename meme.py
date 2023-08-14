@@ -7,6 +7,7 @@ import numpy as np
 import imageio
 import textwrap
 import warnings
+import shutil
 
 warnings.filterwarnings("ignore")
 
@@ -56,26 +57,35 @@ def scale_font(draw, text, box_width, box_height, max_font_size=None):
 
 # Function to get custom position on image for test through ascii-graphical preview with instant input feedback
 def get_custom_position(img_width, text_height):
-    position = {"x": 10, "y": text_height}
+    position = {"x": 10, "y": 0}  # Initialize y position to 0
     position_confirmed = False
     step = 10
 
+    # Get the terminal height (number of rows)
+    terminal_height = shutil.get_terminal_size().lines
+
+    # If the terminal height is smaller than the desired height, adjust it
+    if terminal_height < text_height // step:
+        text_height = (terminal_height - 3) * step  # Leaving some space for other lines
+
     while position_confirmed is False:
-        # Draw the ASCII art box
-        print("+", "-" * (img_width // step), "+")
-        for _ in range(text_height // step):
-            print("|", " " * (img_width // step), "|")
-        print(
-            "|",
-            " " * (position["x"] // step)
-            + "TEXT"
-            + " " * ((img_width - position["x"] - len("TEXT")) // step),
-            "|",
+        # Clear the console
+        os.system("cls" if os.name == "nt" else "clear")
+
+        print("+", "-" * (img_width // step - 2), "+")
+        for _ in range(position["y"] // step):  # Add empty lines before the text
+            print("|", " " * (img_width // step - 3), "|")
+        spaces_before_text = position["x"] // step
+        text_space_before = " " * spaces_before_text
+        text_space_after = " " * (
+            img_width // step - spaces_before_text - len("TEXT") - 1
         )
-        print("|", " " * (img_width // step), "|")
-        for _ in range((img_width - text_height) // step):
-            print("|", " " * (img_width // step), "|")
-        print("+", "-" * (img_width // step), "+")
+        print("|" + text_space_before + "TEXT" + text_space_after + "|")
+        for _ in range(
+            (text_height - position["y"]) // step
+        ):  # Add empty lines after the text
+            print("|", " " * (img_width // step - 3), "|")
+        print("+", "-" * (img_width // step - 2), "+")
 
         user_input = input(
             "Move text with 'w', 'a' 's', 'd', or confirm position with 'x': "
@@ -86,9 +96,11 @@ def get_custom_position(img_width, text_height):
         elif user_input == "a":
             position["x"] = max(0, position["x"] - step)
         elif user_input == "s":
-            position["y"] = min(img_width - text_height, position["y"] + step)
+            position["y"] = min(
+                text_height - step, position["y"] + step
+            )  # Change to text_height
         elif user_input == "d":
-            position["x"] = min(img_width - len("TEXT"), position["x"] + step)
+            position["x"] = min(img_width - len("TEXT") * step, position["x"] + step)
         elif user_input == "x":
             position_confirmed = True
 
