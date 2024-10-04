@@ -10,11 +10,10 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-# Function to calculate the text size and wrap it
 def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
-    font_size = max_font_size or 100  # Start with a larger font size
-    min_font_size = 10  # Don't go below this font size
-    step_size = 10  # Adjust font size by this step size
+    font_size = max_font_size or 100
+    min_font_size = 10 
+    step_size = 10
     font = ImageFont.truetype("impact.ttf", font_size)
 
     while font_size >= min_font_size:
@@ -25,18 +24,14 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
         total_height = sum(line_heights)
 
         if max_line_width <= box_width and total_height <= box_height:
-            # If the text fits, we're done
             return font, text_lines
 
-        # If the text doesn't fit, decrease the font size
         font_size -= step_size
         font = ImageFont.truetype("impact.ttf", font_size)
 
     print("Text can't fit into the box, even at the smallest font size.")
     return font, text_lines
 
-
-# Function to calculate the text size for caption
 def scale_font(draw, text, box_width, box_height, max_font_size=None):
     font_size = 1
     font = ImageFont.truetype("impact.ttf", font_size)
@@ -107,7 +102,7 @@ def process_frame(img, args):
 
     # Create a centered box and then calculate a random position for watermark inside it
     center_x, center_y = final_img.width // 2, final_img.height // 2
-    box_width, box_height = img.width // 2, img.height // 2  # Increased box size
+    box_width, box_height = img.width // 2, img.height // 2
     min_x = center_x - box_width // 2
     min_y = center_y - box_height // 2
 
