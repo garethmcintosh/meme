@@ -18,7 +18,7 @@ def fit_text_to_box(draw, text, box_width, box_height, max_font_size=None):
     font = ImageFont.truetype("impact.ttf", font_size)
 
     while font_size >= min_font_size:
-        text_lines = textwrap.wrap(text, width=int(box_width / (font_size * 0.35)))  # Adjusted divisor for wider lines
+        text_lines = textwrap.wrap(text, width=int(box_width / (font_size * 0.35)))
         line_heights = [draw.textsize(line, font=font)[1] for line in text_lines]
         line_widths = [draw.textsize(line, font=font)[0] for line in text_lines]
         max_line_width = max(line_widths)
@@ -49,9 +49,6 @@ def scale_font(draw, text, box_width, box_height, max_font_size=None):
             font = ImageFont.truetype("impact.ttf", font_size)
         else:
             return font
-
-
-
 
 def process_frame(img, args):
     if args.type == "caption":
@@ -118,14 +115,12 @@ def process_frame(img, args):
         text_width, text_height = font.getsize(line)
         random_x = random.randint(min_x, min_x + box_width - text_width)
         random_y = random.randint(min_y, min_y + box_height - text_height)
-        watermark_position = (random_x, random_y + i * text_height)  # Adjust y position based on line number
+        watermark_position = (random_x, random_y + i * text_height)
         white = (255, 255, 255)
         draw.text(watermark_position, line, fill=white, font=font)
 
     return final_img
 
-
-# Parse command-line arguments
 parser = argparse.ArgumentParser(description="Create a meme image or video")
 parser.add_argument("file", help="Input image or video file")
 parser.add_argument("text", help="Caption for the image/video")
@@ -167,7 +162,7 @@ elif file_ext in ["mp4", "avi", "mov", "mkv"]:
     fps = video.get(cv2.CAP_PROP_FPS)
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     if args.type == "caption":
-        height += int(height * 0.15)  # Adjust height for caption
+        height += int(height * 0.15)
     while True:
         ret, frame = video.read()
         if not ret:
